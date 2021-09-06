@@ -120,4 +120,11 @@ abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
         uint256 currentOpenMints = totalSupply() - reserveMinted;
         return maxOpenMints - currentOpenMints;
     }
+
+    /**
+     * @notice Allows owner to withdraw amount
+     */
+    function withdrawAll() external onlyOwner {
+        payable(owner()).transfer(address(this).balance);
+    }
 }

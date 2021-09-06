@@ -2,7 +2,10 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { NPass } from "../../typechain";
+import { ETH, getEthBalance } from "../../utils/utils";
 import { Contracts, setupIntegration as setupNDerivative, User } from "../fixtures";
+
+const GAS_ADJ = ETH(0.01);
 
 describe("NPass", function () {
   let contracts: Contracts;
@@ -207,6 +210,7 @@ describe("NPass", function () {
       await deployer.NDerivativeWithPrice.mintWithN(1000, { value: price });
       expect(await contracts.NDerivativeWithPrice.ownerOf(1000)).to.be.equals(deployer.address);
     });
+
     it("requires open minter to pay correct amount", async function () {
       const price = await contracts.NDerivativeWithPrice.priceForOpenMintInWei();
       await expect(deployer.NDerivativeWithPrice.mint(10000, { value: price.sub(1) })).to.be.revertedWith(
@@ -217,6 +221,22 @@ describe("NPass", function () {
       );
       await deployer.NDerivativeWithPrice.mint(10000, { value: price });
       expect(await contracts.NDerivativeWithPrice.ownerOf(10000)).to.be.equals(deployer.address);
+    });
+
+    it("allows owner to withdraw", async function () {
+      const price = await contracts.NDerivativeWithPrice.priceForOpenMintInWei();
+      await users[0].NDerivativeWithPrice.mint(10000, { value: price });
+      await users[0].NDerivativeWithPrice.mint(10001, { value: price });
+      const initialBalance = await getEthBalance(deployer.address);
+      await deployer.NDerivativeWithPrice.withdrawAll();
+      expect(await getEthBalance(deployer.address)).to.be.gte(initialBalance.add(price.mul(2)).sub(GAS_ADJ));
+    });
+
+    it("forbids non owner to withdraw", async function () {
+      const price = await contracts.NDerivativeWithPrice.priceForOpenMintInWei();
+      await users[0].NDerivativeWithPrice.mint(10000, { value: price });
+      await users[0].NDerivativeWithPrice.mint(10001, { value: price });
+      await expect(users[0].NDerivativeWithPrice.withdrawAll()).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 });

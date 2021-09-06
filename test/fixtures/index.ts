@@ -1,6 +1,7 @@
 import { deployments, getNamedAccounts, getUnnamedAccounts } from "hardhat";
 import { NPass } from "../../typechain";
 import { N } from "../../typechain/N";
+import { ETH } from "../../utils/utils";
 import { setupUser, setupUsers } from "./users";
 
 export interface Contracts {
@@ -26,7 +27,16 @@ export const setupIntegration = deployments.createFixture(async ({ ethers }) => 
   const nDerivative = (await nPassFactory.deploy("ND", "ND", nAddress, false, 8888, 0, 0, 0)) as NPass;
   const nDerivativeRestricted = (await nPassFactory.deploy("NDR", "NDR", nAddress, true, 8888, 0, 0, 0)) as NPass;
   const nDerivativeWithAllowance = (await nPassFactory.deploy("NDA", "NDA", nAddress, false, 10, 5, 0, 0)) as NPass;
-  const nDerivativeWithPrice = (await nPassFactory.deploy("ND", "ND", nAddress, false, 8888, 0, 1, 5)) as NPass;
+  const nDerivativeWithPrice = (await nPassFactory.deploy(
+    "ND",
+    "ND",
+    nAddress,
+    false,
+    8888,
+    0,
+    ETH(1),
+    ETH(5),
+  )) as NPass;
 
   const contracts: Contracts = {
     NDerivative: nDerivative,
