@@ -16,20 +16,20 @@ describe("NPass", function () {
   describe("Construction", async function () {
     it("reverts on supply = 0", async function () {
       const nPassFactory = await ethers.getContractFactory("MockNPass");
-      await expect(nPassFactory.deploy("ND", "ND", contracts.N.address, true, 0, 0)).to.be.revertedWith(
+      await expect(nPassFactory.deploy("ND", "ND", contracts.N.address, true, 0, 0, 0, 0)).to.be.revertedWith(
         "NPass:INVALID_SUPPLY",
       );
     });
     it("reverts on restricted minting with total supply > n supply", async function () {
       const nPassFactory = await ethers.getContractFactory("MockNPass");
-      await expect(nPassFactory.deploy("ND", "ND", contracts.N.address, true, 10000, 0)).to.be.revertedWith(
+      await expect(nPassFactory.deploy("ND", "ND", contracts.N.address, true, 10000, 0, 0, 0)).to.be.revertedWith(
         "NPass:INVALID_SUPPLY",
       );
     });
 
     it("reverts on minting with total supply < allowance", async function () {
       const nPassFactory = await ethers.getContractFactory("MockNPass");
-      await expect(nPassFactory.deploy("ND", "ND", contracts.N.address, true, 100, 101)).to.be.revertedWith(
+      await expect(nPassFactory.deploy("ND", "ND", contracts.N.address, true, 100, 101, 0, 0)).to.be.revertedWith(
         "NPass:INVALID_ALLOWANCE",
       );
     });
@@ -40,7 +40,7 @@ describe("NPass", function () {
       await users[0].N.claim(2);
       expect(await contracts.N.ownerOf(2)).to.be.equals(users[0].address);
       await expect(deployer.NDerivative.mintWithN(2)).to.be.revertedWith("NPass:INVALID_OWNER");
-      await users[0].NDerivative.mint(2);
+      await users[0].NDerivative.mintWithN(2);
       expect(await contracts.NDerivative.ownerOf(2)).to.be.equals(users[0].address);
     });
 
@@ -71,7 +71,7 @@ describe("NPass", function () {
     it("allows n minting when allowance available", async function () {
       await deployer.N.claim(2);
       expect(await contracts.N.ownerOf(2)).to.be.equals(deployer.address);
-      await deployer.NDerivativeWithAllowance.mint(2);
+      await deployer.NDerivativeWithAllowance.mintWithN(2);
       expect(await contracts.NDerivativeWithAllowance.ownerOf(2)).to.be.equals(deployer.address);
     });
 
@@ -150,7 +150,7 @@ describe("NPass", function () {
 
     it("forbids open minting when total supply=1 and allowance=1", async function () {
       const nPassFactory = await ethers.getContractFactory("MockNPass");
-      const nDerivative = (await nPassFactory.deploy("ND", "ND", contracts.N.address, false, 1, 1)) as NPass;
+      const nDerivative = (await nPassFactory.deploy("ND", "ND", contracts.N.address, false, 1, 1, 0, 0)) as NPass;
       await expect(nDerivative.mint(9999)).to.be.revertedWith("NPass:MAX_ALLOCATION_REACHED");
     });
 
@@ -158,7 +158,7 @@ describe("NPass", function () {
       await deployer.N.claim(1);
       await deployer.N.claim(2);
       const nPassFactory = await ethers.getContractFactory("MockNPass");
-      const nDerivative = (await nPassFactory.deploy("ND", "ND", contracts.N.address, false, 1, 1)) as NPass;
+      const nDerivative = (await nPassFactory.deploy("ND", "ND", contracts.N.address, false, 1, 1, 0, 0)) as NPass;
       await nDerivative.mintWithN(1);
       expect(await nDerivative.ownerOf(1)).to.be.equals(deployer.address);
       await expect(nDerivative.mintWithN(2)).to.be.revertedWith("NPass:MAX_ALLOCATION_REACHED");
@@ -166,7 +166,7 @@ describe("NPass", function () {
 
     it("allows open minting when total supply=1 and allowance=0", async function () {
       const nPassFactory = await ethers.getContractFactory("MockNPass");
-      const nDerivative = (await nPassFactory.deploy("ND", "ND", contracts.N.address, false, 1, 0)) as NPass;
+      const nDerivative = (await nPassFactory.deploy("ND", "ND", contracts.N.address, false, 1, 0, 0, 0)) as NPass;
       await nDerivative.mint(8889);
       expect(await nDerivative.ownerOf(8889)).to.be.equals(deployer.address);
     });
@@ -174,7 +174,16 @@ describe("NPass", function () {
     it("forbids open minting with token id beyond range", async function () {
       const nPassFactory = await ethers.getContractFactory("MockNPass");
       const totalSupply = 100;
-      const nDerivative = (await nPassFactory.deploy("ND", "ND", contracts.N.address, false, totalSupply, 0)) as NPass;
+      const nDerivative = (await nPassFactory.deploy(
+        "ND",
+        "ND",
+        contracts.N.address,
+        false,
+        totalSupply,
+        0,
+        0,
+        0,
+      )) as NPass;
       const lastAllowedTokenId = 8888 + totalSupply;
       await nDerivative.mint(lastAllowedTokenId);
       expect(await nDerivative.ownerOf(lastAllowedTokenId)).to.be.equals(deployer.address);
@@ -182,6 +191,32 @@ describe("NPass", function () {
       await expect(nDerivative.mint(lastAllowedTokenId + 1)).to.be.revertedWith(
         "ERC721: owner query for nonexistent token",
       );
+    });
+  });
+
+  describe("Price", async function () {
+    it("requires n token holder to pay correct amount", async function () {
+      await deployer.N.claim(1000);
+      const price = await contracts.NDerivativeWithPrice.priceForNHoldersInWei();
+      await expect(deployer.NDerivativeWithPrice.mintWithN(1000, { value: price.sub(1) })).to.be.revertedWith(
+        "NPass:INVALID_PRICE",
+      );
+      await expect(deployer.NDerivativeWithPrice.mintWithN(1000, { value: price.add(1) })).to.be.revertedWith(
+        "NPass:INVALID_PRICE",
+      );
+      await deployer.NDerivativeWithPrice.mintWithN(1000, { value: price });
+      expect(await contracts.NDerivativeWithPrice.ownerOf(1000)).to.be.equals(deployer.address);
+    });
+    it("requires open minter to pay correct amount", async function () {
+      const price = await contracts.NDerivativeWithPrice.priceForOpenMintInWei();
+      await expect(deployer.NDerivativeWithPrice.mint(10000, { value: price.sub(1) })).to.be.revertedWith(
+        "NPass:INVALID_PRICE",
+      );
+      await expect(deployer.NDerivativeWithPrice.mint(10000, { value: price.add(1) })).to.be.revertedWith(
+        "NPass:INVALID_PRICE",
+      );
+      await deployer.NDerivativeWithPrice.mint(10000, { value: price });
+      expect(await contracts.NDerivativeWithPrice.ownerOf(10000)).to.be.equals(deployer.address);
     });
   });
 });

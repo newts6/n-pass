@@ -16,6 +16,30 @@ It is thought to give you all the tools to build and deploy a "n" enabled NFT.
 1. deploy running command `yarn hardhat --network mainnet deploy --gasprice "170000000000"`
 1. deploy etherscan verification `yarn hardhat --network mainnet etherscan-verify`
 
+## N Pass Configuration
+
+### onlyNHolders
+
+If set to true this will allow only token holders to mint. Based on other parameters this could mean either all n token holders
+have the right to mint or just a subset.
+
+### maxTotalSupply
+
+Maximum number of tokens that can ever be minted.
+
+### reservedAllowance
+
+Number of tokens reserved for n token holders. This can be less than the total number of n tokens (8888), in which case will
+enact a first come first serve mechanism for n token holders too.
+
+### priceForNHoldersInWei
+
+Price n token holders need to pay to mint.
+
+### priceForOpenMintInWei
+
+Price open minter need to pay to mint.
+
 ## Tools Usage
 
 ### Pre Requisites

@@ -11,6 +11,19 @@ contract MockNPass is NPassCore {
         IN n,
         bool onlyNHolders,
         uint256 maxTotalSupply,
-        uint16 reservedAllowance
-    ) NPassCore(name, symbol, n, onlyNHolders, maxTotalSupply, reservedAllowance) {}
+        uint16 reservedAllowance,
+        uint256 priceForNHoldersInWei,
+        uint256 priceForOpenMintInWei
+    )
+        NPassCore(
+            name,
+            symbol,
+            n,
+            onlyNHolders,
+            maxTotalSupply,
+            reservedAllowance,
+            priceForNHoldersInWei,
+            priceForOpenMintInWei
+        )
+    {}
 }
