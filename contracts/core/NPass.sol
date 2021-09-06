@@ -17,10 +17,23 @@ abstract contract NPass is NPassCore {
      * @param name Name of the token
      * @param symbol Symbol of the token
      * @param onlyNHolders True if only n tokens holders can mint this token
+     * @param maxTotalSupply Maximum number of tokens that can ever be minted
+     * @param reservedAllowance Number of tokens reserved for n token holders
      */
     constructor(
         string memory name,
         string memory symbol,
-        bool onlyNHolders
-    ) NPassCore(name, symbol, IN(0x05a46f1E545526FB803FF974C790aCeA34D1f2D6), onlyNHolders) {}
+        bool onlyNHolders,
+        uint256 maxTotalSupply,
+        uint16 reservedAllowance
+    )
+        NPassCore(
+            name,
+            symbol,
+            IN(0x05a46f1E545526FB803FF974C790aCeA34D1f2D6),
+            onlyNHolders,
+            maxTotalSupply,
+            reservedAllowance
+        )
+    {}
 }

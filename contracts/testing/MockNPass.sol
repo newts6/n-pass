@@ -9,6 +9,8 @@ contract MockNPass is NPassCore {
         string memory name,
         string memory symbol,
         IN n,
-        bool onlyNHolders
-    ) NPassCore(name, symbol, n, onlyNHolders) {}
+        bool onlyNHolders,
+        uint256 maxTotalSupply,
+        uint16 reservedAllowance
+    ) NPassCore(name, symbol, n, onlyNHolders, maxTotalSupply, reservedAllowance) {}
 }
