@@ -239,4 +239,54 @@ describe("NPass", function () {
       await expect(users[0].NDerivativeWithPrice.withdrawAll()).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
+
+  describe("Multi mint", async function () {
+    it("allows to mint multiple owned tokens", async function () {
+      await deployer.N.claim(1);
+      await deployer.N.claim(2);
+      await deployer.N.claim(3);
+      expect(await contracts.N.ownerOf(1)).to.be.equals(deployer.address);
+      expect(await contracts.N.ownerOf(2)).to.be.equals(deployer.address);
+      expect(await contracts.N.ownerOf(3)).to.be.equals(deployer.address);
+      await deployer.NDerivative.multiMintWithN([1, 2, 3]);
+      expect(await contracts.NDerivative.ownerOf(1)).to.be.equals(deployer.address);
+      expect(await contracts.NDerivative.ownerOf(2)).to.be.equals(deployer.address);
+      expect(await contracts.NDerivative.ownerOf(3)).to.be.equals(deployer.address);
+    });
+
+    it("allows to mint multiple owned tokens with price", async function () {
+      await deployer.N.claim(1);
+      await deployer.N.claim(2);
+      await deployer.N.claim(3);
+      expect(await contracts.N.ownerOf(1)).to.be.equals(deployer.address);
+      expect(await contracts.N.ownerOf(2)).to.be.equals(deployer.address);
+      expect(await contracts.N.ownerOf(3)).to.be.equals(deployer.address);
+      const price = await contracts.NDerivativeWithPrice.priceForNHoldersInWei();
+      await deployer.NDerivativeWithPrice.multiMintWithN([1, 2, 3], { value: price.mul(3) });
+      expect(await contracts.NDerivativeWithPrice.ownerOf(1)).to.be.equals(deployer.address);
+      expect(await contracts.NDerivativeWithPrice.ownerOf(2)).to.be.equals(deployer.address);
+      expect(await contracts.NDerivativeWithPrice.ownerOf(3)).to.be.equals(deployer.address);
+    });
+
+    it("reverts multi mint if one token not owned", async function () {
+      await deployer.N.claim(1);
+      await deployer.N.claim(2);
+      await users[0].N.claim(3);
+      expect(await contracts.N.ownerOf(1)).to.be.equals(deployer.address);
+      expect(await contracts.N.ownerOf(2)).to.be.equals(deployer.address);
+      await expect(deployer.NDerivative.multiMintWithN([1, 2, 3])).to.be.revertedWith("NPass:INVALID_OWNER");
+    });
+
+    it("reverts multi mint if goes above total supply", async function () {
+      await expect(deployer.NDerivativeWithAllowance.multiMintWithN([1, 2, 3, 4, 5, 6])).to.be.revertedWith(
+        "NPass:MAX_ALLOCATION_REACHED",
+      );
+    });
+    it("reverts multi mint if price wrong", async function () {
+      const price = await contracts.NDerivativeWithPrice.priceForNHoldersInWei();
+      await expect(
+        deployer.NDerivativeWithPrice.multiMintWithN([1, 2, 3, 4, 5], { value: price.mul(3) }),
+      ).to.be.revertedWith("NPass:INVALID_PRICE");
+    });
+  });
 });

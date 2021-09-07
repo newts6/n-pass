@@ -13,6 +13,7 @@ import "../interfaces/IN.sol";
  * @dev This contract should be used only for testing or testnet deployments
  */
 abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
+    uint256 public constant MAX_MULTI_MINT_AMOUNT = 32;
     uint256 public constant MAX_N_TOKEN_ID = 8888;
 
     IN public immutable n;
@@ -54,6 +55,34 @@ abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
         reservedAllowance = reservedAllowance_;
         priceForNHoldersInWei = priceForNHoldersInWei_;
         priceForOpenMintInWei = priceForOpenMintInWei_;
+    }
+
+    /**
+     * @notice Allow a n token holder to bulk mint tokens with id of their n tokens' id
+     * @param tokenIds Ids to be minted
+     */
+    function multiMintWithN(uint256[] calldata tokenIds) public payable virtual nonReentrant {
+        uint256 maxTokensToMint = tokenIds.length;
+        require(maxTokensToMint <= MAX_MULTI_MINT_AMOUNT, "NPass:TOO_LARGE");
+        require(
+            // If no reserved allowance we respect total supply contraint
+            (reservedAllowance == 0 && totalSupply() + maxTokensToMint <= maxTotalSupply) ||
+                reserveMinted + maxTokensToMint <= reservedAllowance,
+            "NPass:MAX_ALLOCATION_REACHED"
+        );
+        require(msg.value == priceForNHoldersInWei * maxTokensToMint, "NPass:INVALID_PRICE");
+        // To avoid wasting gas we want to check all preconditions beforehand
+        for (uint256 i = 0; i < maxTokensToMint; i++) {
+            require(n.ownerOf(tokenIds[i]) == msg.sender, "NPass:INVALID_OWNER");
+        }
+
+        // If reserved allowance is active we track mints count
+        if (reservedAllowance > 0) {
+            reserveMinted += uint16(maxTokensToMint);
+        }
+        for (uint256 i = 0; i < maxTokensToMint; i++) {
+            _safeMint(msg.sender, tokenIds[i]);
+        }
     }
 
     /**
