@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IN.sol";
 
 /**
- * @title NPass contract
+ * @title NPassCore contract
  * @author Tony Snark
  * @notice This contract provides basic functionalities to allow minting using the NPass
  * @dev This contract should be used only for testing or testnet deployments
