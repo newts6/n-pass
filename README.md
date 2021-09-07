@@ -40,6 +40,35 @@ Price n token holders need to pay to mint.
 
 Price open minter need to pay to mint.
 
+## Testing Locally
+
+If you want to test your contract locally this template provides forked mainnet capabilities out of the box. In this way you will be able to test directly against the real n token contract as it is in mainnet.
+
+To start the forked environmnet run:
+
+`yarn fork`
+
+To run your deployment scripts run
+
+`yarn deploy-fork`
+
+If you need n token to be sent to a specific address you can use the following task:
+
+```
+Usage: hardhat [GLOBAL OPTIONS] transfer-n [--recipient <STRING>] [--tokens <STRING>]
+
+OPTIONS:
+
+  --recipient   Where to send n tokens (default: null)
+  --tokens      Tokens to transfer (default: null)
+
+transfer-n: Transfers n tokens to a recipient
+```
+
+for example this will transfer tokens #888 #1 and #69 to the address 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B
+
+`yarn hardhat --network hardhat transfer-n --recipient 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B --tokens 888,1,69`
+
 ## Tools Usage
 
 ### Pre Requisites

@@ -71,7 +71,9 @@
     "prettier:list-different": "prettier --config .prettierrc --list-different \"**/*.{js,json,md,sol,ts}\"",
     "test": "yarn test:unit",
     "test:unit": "hardhat test test/unit/*",
-    "typechain": "hardhat typechain"
+    "typechain": "hardhat typechain",
+    "fork": "yarn hardhat node --no-deploy",
+    "deploy:fork": "yarn hardhat deploy"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.2.0"
