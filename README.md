@@ -48,6 +48,8 @@ To start the forked environmnet run:
 
 `yarn fork`
 
+When launched you will have a forked blockchain running at `http://127.0.0.1:8545/` so you can point you web3 provider (e.g. Metamask) there.
+
 To run your deployment scripts run (in a different shell):
 
 `yarn deploy-fork`
