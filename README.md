@@ -48,7 +48,8 @@ To start the forked environmnet run:
 
 `yarn fork`
 
-When launched you will have a forked blockchain running at `http://127.0.0.1:8545/` so you can point you web3 provider (e.g. Metamask) there.
+When launched you will have a forked blockchain running at `http://127.0.0.1:8545/` so you can point you web3 provider (e.g. Metamask) there with chain id `1337`.
+To use this network you need to create a wallet using the seed in your [secrets file](.env). The first 10 accounts from this seed will have 1000 ETH each.
 
 To run your deployment scripts run (in a different shell):
 
