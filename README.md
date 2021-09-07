@@ -48,7 +48,7 @@ To start the forked environmnet run:
 
 `yarn fork`
 
-To run your deployment scripts run
+To run your deployment scripts run (in a different shell):
 
 `yarn deploy-fork`
 
@@ -67,7 +67,7 @@ transfer-n: Transfers n tokens to a recipient
 
 for example this will transfer tokens #888 #1 and #69 to the address 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B
 
-`yarn hardhat --network hardhat transfer-n --recipient 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B --tokens 888,1,69`
+`yarn hardhat transfer-n --recipient 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B --tokens 888,1,69`
 
 ## Tools Usage
 
