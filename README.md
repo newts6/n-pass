@@ -4,7 +4,7 @@
 
 This is a start pack to build NFTs using the NPass from the n project.
 It is thought to give you all the tools to build and deploy a "n" enabled NFT.
-Throughout the codebase there are `TODO` comments which help customise your code (use the find funtion to find them)
+Throughout the codebase there are `TODO` comments which help customise your code (use the find function to find them)
 
 ## Smart Contracts
 
@@ -54,7 +54,7 @@ To start the forked environmnet run:
 `yarn fork`
 
 When launched you will have a forked blockchain running at `http://127.0.0.1:8545/` so you can point you web3 provider (e.g. Metamask select network localhost:8545).
-To use this network you need to create a wallet using the seed in your [secrets file](.env). The first 10 accounts from this seed will have 1000 ETH each.
+To use this network you need to create a wallet using the seed in your ./.env file. The first 10 accounts from this seed will have 1000 ETH each.
 
 To run your deployment scripts run (in a different shell):
 
