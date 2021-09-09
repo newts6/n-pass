@@ -12,7 +12,6 @@ coverage/
 dist/
 lib/
 node_modules/
-typechain/
 .history/
 deployment/history
 deployments/localhost
@@ -26,5 +25,23 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 *.bak
+*.pem
 bin/contracts
 
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.envrc
+
+networks/networks.local.json
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# vercel
+.vercel

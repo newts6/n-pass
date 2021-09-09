@@ -7,12 +7,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { deployer } = await getNamedAccounts();
 
-  await deploy("NPass", {
+  await deploy("NDerivative", {
     //TODO Replace with your contract's name
     from: deployer,
     log: true,
-    args: [], //TODO Replace with your contract's constructor args
+    args: ["0x05a46f1E545526FB803FF974C790aCeA34D1f2D6"], //TODO Replace with your contract's constructor args
   });
 };
 export default func;
-func.tags = ["NPass"];
+func.tags = ["NDerivative"];
