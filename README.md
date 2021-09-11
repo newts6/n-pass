@@ -16,7 +16,7 @@ Smart contract are written in Solidity and managed via hardhat.
 1. Create a subcontract which derives from NPass.sol [example](contracts/testing/MockNPass.sol)
    1. Decide if this only for n token holders. If yes, set the constructor argument `onlyNHolders` to true
 1. Build you NFT custom logic/metadata
-1. Customise [deployment script](deploy/01_N_PASS.ts)
+1. Customise [deployment script](deploy/01_deploy_derivative.ts)
 1. Set up a .env file with the relevant variables [example](./.env.example)
 1. deploy running command `yarn hardhat --network mainnet deploy --gasprice "170000000000"`
 1. deploy etherscan verification `yarn hardhat --network mainnet etherscan-verify`
