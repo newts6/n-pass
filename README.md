@@ -49,7 +49,7 @@ Price open minter need to pay to mint.
 
 If you want to test your contract locally this template provides forked mainnet capabilities out of the box. In this way you will be able to test directly against the real n token contract as it is in mainnet.
 
-To start the forked environmnet run:
+To start the forked environment run:
 
 `yarn fork`
 
