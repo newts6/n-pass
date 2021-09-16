@@ -44,7 +44,7 @@ export const MintStep: React.FC<MintStepProps> = ({ selectedN, onCancel, onSucce
       const signer = provider.getSigner();
       const contractWithSigner = mainContract.connect(signer);
 
-      const result = await contractWithSigner.mintWithN(numericId);
+      const result = await contractWithSigner.mintWithN(numericId, {value: mainContract.priceForNHoldersInWei()});
 
       setMintingTxn(result.hash);
       await result.wait();
