@@ -289,4 +289,30 @@ describe("NPass", function () {
       ).to.be.revertedWith("NPass:INVALID_PRICE");
     });
   });
+
+  describe('Events', async () => {
+    it("Mint should emit a Mint Event", async () => {
+      const tx = await deployer.NDerivative.mint(9999);
+      const receipt = await tx.wait();
+      const mintEvent = receipt.events?.filter(e => e.event == "Mint");
+      expect(mintEvent).to.be.length(1);
+      const args = mintEvent ? mintEvent[0].args : null;
+      expect(args?.tokenId.toString()).to.equal("9999");
+      expect(args?.to).to.equal(deployer.address);
+    });
+
+    it("Multiple Mint should emit a multiple Mint Events", async function () {
+      await deployer.N.claim(1);
+      await deployer.N.claim(2);
+      await deployer.N.claim(3);
+      expect(await contracts.N.ownerOf(1)).to.be.equals(deployer.address);
+      expect(await contracts.N.ownerOf(2)).to.be.equals(deployer.address);
+      expect(await contracts.N.ownerOf(3)).to.be.equals(deployer.address);
+      const tx = await deployer.NDerivative.multiMintWithN([1, 2, 3]);
+      const receipt = await tx.wait();
+      const mintEvent = receipt.events?.filter(e => e.event == "Mint");
+      expect(mintEvent).to.be.length(3);
+    });
+
+  });
 });
