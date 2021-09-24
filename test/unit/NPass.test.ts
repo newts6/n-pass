@@ -315,4 +315,23 @@ describe("NPass", function () {
     });
 
   });
+
+  describe("Pause", async function () {
+    it("Owner can pause and unpause", async () => {
+      await deployer.NDerivative.mint(9999);
+      expect(await contracts.NDerivative.ownerOf(9999)).to.be.equals(deployer.address);
+      // pause
+      await deployer.NDerivative.pause();
+      await expect(deployer.NDerivative.mint(9988)).to.be.revertedWith("ERC721Pausable: token transfer while paused");
+      // unpause
+      await deployer.NDerivative.unpause();
+      await deployer.NDerivative.mint(9988);
+      expect(await contracts.NDerivative.ownerOf(9988)).to.be.equals(deployer.address);
+    });
+
+    it("Users can't pause ", async () => {
+      await expect(users[0].NDerivative.pause()).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
+
 });
