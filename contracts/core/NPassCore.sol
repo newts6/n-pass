@@ -4,6 +4,7 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import "../interfaces/IN.sol";
 
 /**
@@ -12,7 +13,7 @@ import "../interfaces/IN.sol";
  * @notice This contract provides basic functionalities to allow minting using the NPass
  * @dev This contract should be used only for testing or testnet deployments
  */
-abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
+abstract contract NPassCore is ERC721Enumerable, ERC721Pausable, ReentrancyGuard, Ownable {
     uint256 public constant MAX_MULTI_MINT_AMOUNT = 32;
     uint256 public constant MAX_N_TOKEN_ID = 8888;
 
@@ -160,5 +161,48 @@ abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
      */
     function withdrawAll() external onlyOwner {
         payable(owner()).transfer(address(this).balance);
+    }
+
+    //
+    // PAUSE
+    //
+
+    /**
+     * @dev Pauses all token transfers.
+     *
+     * See {ERC721Pausable} and {Pausable-_pause}.
+     */
+    function pause() public virtual onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Unpauses all token transfers.
+     *
+     * See {ERC721Pausable} and {Pausable-_unpause}.
+     */
+    function unpause() public virtual onlyOwner {
+        _unpause();
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721Enumerable, ERC721Pausable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }
