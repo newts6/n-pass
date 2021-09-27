@@ -24,6 +24,8 @@ abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
     uint256 public immutable priceForNHoldersInWei;
     uint256 public immutable priceForOpenMintInWei;
 
+    event Minted(address to, uint256 tokenId);
+
     /**
      * @notice Construct an NPassCore instance
      * @param name Name of the token
@@ -82,6 +84,7 @@ abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
         }
         for (uint256 i = 0; i < maxTokensToMint; i++) {
             _safeMint(msg.sender, tokenIds[i]);
+            emit Minted(msg.sender, tokenIds[i]);
         }
     }
 
@@ -103,6 +106,7 @@ abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
             reserveMinted++;
         }
         _safeMint(msg.sender, tokenId);
+        emit Minted(msg.sender, tokenId);
     }
 
     /**
@@ -121,6 +125,7 @@ abstract contract NPassCore is ERC721Enumerable, ReentrancyGuard, Ownable {
         require(msg.value == priceForOpenMintInWei, "NPass:INVALID_PRICE");
 
         _safeMint(msg.sender, tokenId);
+        emit Minted(msg.sender, tokenId);
     }
 
     /**
